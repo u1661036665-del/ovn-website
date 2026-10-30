@@ -1,0 +1,30 @@
+# Base44 development environment for the OVN website (Hugo static site).
+#
+# The site is built and served live from the cloned source in ./src, so edits to
+# content/layouts/themes are picked up by Hugo's file watcher without a rebuild.
+# There is no database and no external service: the site is fully static.
+services:
+  web:
+    # Hugo itself is the dev runtime here (like node/python for app repos); the
+    # site source is bind-mounted rather than baked into an image.
+    image: hugomods/hugo:base
+    working_dir: /src
+    command:
+      - sh
+      - -ec
+      - exec hugo server --source /src --bind 0.0.0.0 --port 1313 --baseURL / --appendPort=false --disableFastRender
+    ports:
+      - "3000:1313"
+    volumes:
+      - ./src:/src
+    restart: on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:1313/en/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    labels:
+      base44.project: OVN website
+      base44.kind: web
+      base44.port: "3000"
