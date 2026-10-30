@@ -15,6 +15,11 @@ database and no external service — nothing needs credentials.
 - Base URL is kept root-relative (`--baseURL / --appendPort=false`) so the
   proxied preview origin resolves assets and links correctly. Keep this flag if
   you change the command: Hugo otherwise bakes `localhost:1313` into links.
+- `src/layouts/partials/search.html` overrides the theme's partial: it builds the
+  search index URL root-relative (`/en/index.json`). The theme concatenated
+  `.Site.BaseURL` with the language prefix, which with a path baseURL turned into
+  the protocol-relative `//en` and broke search with ERR_NAME_NOT_RESOLVED. Keep
+  the override in place when updating the theme.
 - Hugo's file watcher works on the bind mount (verified: editing a content file
   triggers "Change detected, rebuilding site"). Content edits need no restart;
   a change to `docker-compose.base44.yml` or the image does.
